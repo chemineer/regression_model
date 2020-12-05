@@ -1,0 +1,74 @@
+---
+title: "regr_m_ch03"
+author: "SS Huh"
+date: '2020 12 5 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 분산팽창인자
+
+
+
+```{r }
+hospital=read.table("hospital.txt", header=T)
+head(hospital)
+hospital.lm=lm(Y~X1+X2+X3+X4+X5,data=hospital)
+summary(hospital.lm)
+avova(hospital.lm)
+```
+```{r }
+install.packages("fmsb")
+library(fmsb)
+```
+
+```{r }
+VIF(lm(X1~X2+X3+X4+X5, data=hospital))
+VIF(lm(X2~X1+X3+X4+X5, data=hospital))
+VIF(lm(X3~X1+X2+X4+X5, data=hospital))
+VIF(lm(X4~X1+X2+X3+X5, data=hospital))
+VIF(lm(X5~X1+X2+X3+X4, data=hospital))
+
+cor(hospital[,-6])
+summary(lm(Y~X2+X3+X4+X5,data=hospital))
+```
+```{r }
+VIF(lm(X2~X3+X4+X5, data=hospital))
+VIF(lm(X3~X2+X4+X5, data=hospital))
+VIF(lm(X4~X2+X3+X5, data=hospital))
+VIF(lm(X5~X2+X3+X4, data=hospital))
+```
+```{r }
+hald=read.table("hald.txt", header=T)
+head(hald)
+```
+```{r }
+install.packages("leaps")
+library(leaps)
+```
+
+```{r }
+all.lm=regsubsets(Y~., data=hald)
+rs=summary(all.lm)
+names(rs)
+rs$rsq
+rs$adjr2
+rs$cp
+```
+
+```{r }
+start.lm=lm(Y~1,data=hald)
+full.lm=lm(Y~., data=hald)
+step(start.lm, scope=list(lower=start.lm, upper=full.lm),direction="forward")
+```
+
+```{r }
+step(full.lm, data=hald, direction="backward")
+```
+
+```{r }
+step(start.lm, scope=list(upper=full.lm ), data=hald, direction="both")
+```
